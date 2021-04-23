@@ -249,7 +249,9 @@ begin
 	
 	# Add the two extra constructors
 	# (Should we make these missing by default? if so - remove hint below)
-	RankOneMatrix(v::AbstractVector) = RankOneMatrix(v, v)
+	RankOneMatrix(v::AbstractVector{T} where T) = RankOneMatrix(v, v)
+	Base.size(M::RankOneMatrix{T} where T) = (size(M.v)[1], size(M.w)[1])
+	Base.getindex(M::RankOneMatrix{T} where T, i, j) = M.v[i] * M.w[j]
 end
 
 # ╔═╡ 1d16e228-850e-11eb-1dca-41df85b706da
@@ -271,16 +273,16 @@ md"""
 """
 
 # ╔═╡ f2d8b45c-8501-11eb-1c6a-5f819c240d9d
-function Base.size(M::RankOneMatrix)
-	return (size(M.v)[1], size(M.w)[1]) # Your code here
-end
-#Base.size(M::RankOneMatrix) = (size(M.v)[1], size(M.w)[1])
+#function Base.size(M::RankOneMatrix)
+	
+#	return missing # Your code here
+#end
 
 # ╔═╡ ed72e880-8afa-11eb-3a4a-175a838188d9
 #function Base.getindex(M::RankOneMatrix, i, j)
+	
 #	return missing # Your code here
 #end
-Base.getindex(M::RankOneMatrix, i, j) = M.v[i] * M.w[j]
 
 # ╔═╡ 7b3fb0ef-9a9e-401c-8c09-e5615134a4ad
 R2 = RankOneMatrix([1,2], [3,4,5])
@@ -427,7 +429,7 @@ md"""
 
 # ╔═╡ c49e350e-8503-11eb-15de-7308dd03dc08
 function Base.getindex(M::LowRankMatrix, i, j)
-	return sum(map((x)->getindex(x, i, j), M.Ms)) # Your code here
+	return reduce(+, map((x)->getindex(x, i, j), M.Ms)) # Your code here
 end
 
 # ╔═╡ fe6df9bf-6059-4b76-af39-385d395ece72
@@ -461,7 +463,7 @@ md"""
 
 # ╔═╡ 3fed837a-8512-11eb-1fdd-c1b72b48d07b
 function matvec(M::LowRankMatrix, x)
-	return sum(map((y)->matvec(y, x), M.Ms))  # Your code here
+	return reduce(+, map((y)->matvec(y, x), M.Ms))  # Your code here
 end
 
 # ╔═╡ 2d65bd1a-8512-11eb-1bd2-0313588dfa0e
@@ -505,7 +507,7 @@ md"""
 """
 
 # ╔═╡ 210392ff-0a22-4e55-be08-9f58804282cf
-singular_values_of_biggie = svd(biggie).S
+singular_values_of_biggie = missing
 
 # ╔═╡ bb649c89-709c-49c8-8111-53044e8e682a
 md"""
@@ -532,8 +534,7 @@ Keep things simple. Inside your method, call `LinearAlgebra.svd` on a type that 
 # ╔═╡ 6c9ae344-084e-459c-841c-8377451507fd
 function LinearAlgebra.svd(A::RankOneMatrix)
 	
-	return LinearAlgebra.svd(Matrix(A))
-	
+	return missing
 end
 
 # ╔═╡ 9ae28bc5-d9cb-479d-8c22-7c9248cd5fa0
@@ -561,7 +562,7 @@ To keep things simple, you can assume that "approximately zero" means: less than
 # ╔═╡ a2b7f0c3-488b-4ce9-aed6-b8ccddac6a57
 function numerical_rank(A::AbstractMatrix; tol=1e-5)
 	
-	return count((x)->abs(x) >= tol, svd(A).S)
+	return missing
 end
 
 # ╔═╡ d3420859-d558-47cb-aaf7-d51a5e2d1f6e
@@ -1192,7 +1193,7 @@ bigbreak
 # ╠═dd27f508-8503-11eb-36b9-33f5f99f78b0
 # ╠═93a75ea0-8b0c-11eb-3946-3d5d92487fb5
 # ╟─84d7bc07-e211-4296-98e6-f03723481e37
-# ╟─4ed7c189-3130-4f6a-b57b-5322fdd4cef6
+# ╠═4ed7c189-3130-4f6a-b57b-5322fdd4cef6
 # ╟─1083d5ee-8512-11eb-0fdc-ab3987f94bc5
 # ╠═3fed837a-8512-11eb-1fdd-c1b72b48d07b
 # ╟─863f4490-8b06-11eb-352b-61cec188ae57
@@ -1226,7 +1227,7 @@ bigbreak
 # ╟─7fdc110a-a3e3-44e5-a547-b75e03e0d21e
 # ╠═01b12200-2e7e-4f19-96b9-5b6d6cb03233
 # ╠═e1e1067b-93ba-40df-bd09-7599538e6181
-# ╠═1276103b-8c58-4757-ae80-5ffb7f870d09
+# ╟─1276103b-8c58-4757-ae80-5ffb7f870d09
 # ╟─00f5bea8-b808-483a-ad70-332f521481f5
 # ╠═a6bb92f9-0cb2-4fdd-8b67-f286edbbdcb6
 # ╠═57c19601-122b-414f-bc99-56f98c794e61
